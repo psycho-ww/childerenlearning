@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ကလေးတို့ရဲ့ ပျော်ရွှင်ဖွယ် သင်ယူရေး ကမ္ဘာ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Playful Burmese Text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti for Quiz Celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        appGreen: '#4CAF50',
+                        appGreenLight: '#C8E6C9',
+                        appGreenDark: '#2E7D32',
+                        appPink: '#FF80AB',
+                        appPinkLight: '#F8BBD0',
+                        appPinkDark: '#C2185B',
+                        appBg: '#FFF5F7'
+                    },
+                    fontFamily: {
+                        burmese: ['Padauk', 'Fredoka', 'sans-serif'],
+                        play: ['Fredoka', 'Padauk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Padauk', 'Fredoka', cursive, sans-serif;
+            background-color: #FFF5F7;
+            background-image: radial-gradient(#81C784 0.8px, transparent 0.8px), radial-gradient(#F8BBD0 0.8px, #FFF5F7 0.8px);
+            background-size: 28px 28px;
+            background-position: 0 0, 14px 14px;
+            user-select: none;
+        }
+
+        .bouncy {
+            transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bouncy:hover {
+            transform: scale(1.05) translateY(-3px);
+        }
+        .bouncy:active {
+            transform: scale(0.95);
+        }
+
+        /* Drawing Canvas styling */
+        .canvas-container {
+            position: relative;
+            touch-action: none;
+        }
+
+        .stroke-arrow {
+            animation: bounceArrow 1s infinite alternate;
+        }
+        @keyframes bounceArrow {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(6px) scale(1.15); }
+        }
+
+        .pulse-star {
+            animation: pulseStar 1.5s infinite alternate;
+        }
+        @keyframes pulseStar {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.2) rotate(15deg); }
+        }
+
+        /* Duolingo Style Tracing Overlay Styling */
+        .duo-stroke-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            animation: pulseDot 1.2s infinite alternate;
+        }
+        @keyframes pulseDot {
+            0% { transform: scale(0.95); }
+            100% { transform: scale(1.15); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-gray-800">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-white/95 backdrop-blur-md border-b-4 border-appGreen sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="w-12 h-12 bg-appGreen rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg bouncy border-2 border-white">
+                    🍏
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-appGreenDark leading-none">ကလေးတို့ ကမ္ဘာ</h1>
+                    <p class="text-xs text-appPinkDark font-semibold">အရေး၊ အဖတ်၊ ဇယားများ နှင့် ဉာဏ်စမ်း</p>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <nav class="flex flex-wrap gap-1.5 md:gap-2 justify-center w-full lg:w-auto">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn bg-appGreen text-white px-3 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-md bouncy flex items-center gap-1 border-2 border-appGreenDark">
+                    <span>🏠</span> ပင်မ
+                </button>
+                <button onclick="switchTab('en')" id="nav-en" class="nav-btn bg-white text-appGreenDark hover:bg-appGreenLight px-3 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-md bouncy flex items-center gap-1 border-2 border-appGreen">
+                    <span>🔤</span> A-Z အင်္ဂလိပ်
+                </button>
+                <button onclick="switchTab('mm')" id="nav-mm" class="nav-btn bg-white text-appPinkDark hover:bg-appPinkLight px-3 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-md bouncy flex items-center gap-1 border-2 border-appPink">
+                    <span>🇲🇲</span> က-အ မြန်မာ
+                </button>
+                <button onclick="switchTab('num')" id="nav-num" class="nav-btn bg-white text-yellow-700 hover:bg-yellow-100 px-3 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-md bouncy flex items-center gap-1 border-2 border-yellow-400">
+                    <span>🔢</span> ဂဏန်းများ (၁-၁၀၀)
+                </button>
+                <button onclick="switchTab('charts')" id="nav-charts" class="nav-btn bg-white text-indigo-700 hover:bg-indigo-100 px-3 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-md bouncy flex items-center gap-1 border-2 border-indigo-300">
+                    <span>📊</span> ဇယားများ
+                </button>
+                <button onclick="switchTab('quiz')" id="nav-quiz" class="nav-btn bg-white text-purple-600 hover:bg-purple-100 px-3 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-md bouncy flex items-center gap-1 border-2 border-purple-300">
+                    <span>🧩</span> ဉာဏ်စမ်း ၄ မျိုး
+                </button>
+                <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn bg-white text-pink-600 hover:bg-pink-100 px-3 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-md bouncy flex items-center gap-1 border-2 border-pink-300">
+                    <span>👧🏻</span> Profile
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
+
+        <!-- 0. LANDING WELCOME PAGE -->
+        <section id="section-home" class="tab-content block">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-green-400 via-emerald-300 to-pink-300 rounded-3xl p-6 md:p-10 shadow-2xl text-white mb-8 border-4 border-white relative overflow-hidden">
+                <div class="max-w-2xl relative z-10">
+                    <span class="bg-white text-appGreenDark font-bold px-4 py-1.5 rounded-full text-xs md:text-sm shadow mb-3 inline-block">
+                        ✨ မြန်မာကလေးငယ်များအတွက် အထူးဒီဇိုင်း
+                    </span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold leading-tight text-emerald-950 mb-3 drop-shadow-sm">
+                        ပျော်ရွှင်စွာ ရေးကြမည်၊ ဖတ်ကြမည်! 🍏🩷
+                    </h2>
+                    <p class="text-gray-800 text-sm md:text-base font-semibold mb-6">
+                        A to Z၊ က မှ အ အထိ စာလုံးများ၊ 1 to 100 ဂဏန်း ဇယားများနှင့် စိတ်ဝင်စားဖွယ် ဉာဏ်စမ်းဂိမ်းများကို ရောင်စုံလမ်းညွှန်ချက်များနှင့်အတူ လေ့ကျင့်လိုက်ပါ။
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="switchTab('en')" class="bg-appGreenDark text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-green-900 bouncy text-sm md:text-base">
+                            စတင်လေ့ကျင့်မည် 🚀
+                        </button>
+                        <button onclick="switchTab('charts')" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 bouncy text-sm md:text-base">
+                            ဇယားများကြည့်မည် 📊
+                        </button>
+                        <button onclick="switchTab('quiz')" class="bg-appPinkDark text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-pink-800 bouncy text-sm md:text-base">
+                            ဉာဏ်စမ်းဂိမ်းကစားမည် 🧩
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Gallery Display Cards -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-appGreenDark mb-4 flex items-center gap-2">
+                    <span>📸</span> သင်ယူမှုဆိုင်ရာ ဓာတ်ပုံနှင့် ကတ်ပြားများ
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Gallery Card 1 -->
+                    <div class="bg-white rounded-2xl p-4 shadow-lg border-2 border-appGreenLight bouncy text-center flex flex-col items-center">
+                        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=400&auto=format&fit=crop" 
+                             alt="English Alphabet Learning" 
+                             class="w-full h-36 object-cover rounded-xl mb-3 shadow-sm"
+                             onerror="this.src='https://placehold.co/400x200/C8E6C9/2E7D32?text=English+A-Z';">
+                        <h4 class="font-bold text-appGreenDark">အင်္ဂလိပ် စာလုံးများ (A-Z)</h4>
+                        <p class="text-xs text-gray-500 mt-1">အသံထွက်နှင့် မြှားပြအညွှန်းများဖြင့် ရေးဆွဲပါ</p>
+                        <button onclick="switchTab('en')" class="mt-3 bg-appGreen text-white text-xs px-4 py-2 rounded-xl font-bold hover:bg-appGreenDark">
+                            သွားရောက်မည် ➔
+                        </button>
+                    </div>
+
+                    <!-- Gallery Card 2 -->
+                    <div class="bg-white rounded-2xl p-4 shadow-lg border-2 border-appPinkLight bouncy text-center flex flex-col items-center">
+                        <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=400&auto=format&fit=crop" 
+                             alt="Myanmar Alphabet Learning" 
+                             class="w-full h-36 object-cover rounded-xl mb-3 shadow-sm"
+                             onerror="this.src='https://placehold.co/400x200/F8BBD0/C2185B?text=Myanmar+Alphabet';">
+                        <h4 class="font-bold text-appPinkDark">မြန်မာဗျည်းများ (က-အ)</h4>
+                        <p class="text-xs text-gray-500 mt-1">က မှ အ အထိ ဗျည်း ၃၃ လုံး အရေးအဖတ်</p>
+                        <button onclick="switchTab('mm')" class="mt-3 bg-appPinkDark text-white text-xs px-4 py-2 rounded-xl font-bold hover:bg-pink-700">
+                            သွားရောက်မည် ➔
+                        </button>
+                    </div>
+
+                    <!-- Gallery Card 3 -->
+                    <div class="bg-white rounded-2xl p-4 shadow-lg border-2 border-yellow-200 bouncy text-center flex flex-col items-center">
+                        <img src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=400&auto=format&fit=crop" 
+                             alt="Numbers Learning" 
+                             class="w-full h-36 object-cover rounded-xl mb-3 shadow-sm"
+                             onerror="this.src='https://placehold.co/400x200/FFF9C4/F57F17?text=Numbers+1-100';">
+                        <h4 class="font-bold text-yellow-700">ဂဏန်းများ (1 မှ 100)</h4>
+                        <p class="text-xs text-gray-500 mt-1">အင်္ဂလိပ်/မြန်မာ ဂဏန်း ၁ မှ ၁၀၀ ဇယား</p>
+                        <button onclick="switchTab('num')" class="mt-3 bg-yellow-500 text-white text-xs px-4 py-2 rounded-xl font-bold hover:bg-yellow-600">
+                            သွားရောက်မည် ➔
+                        </button>
+                    </div>
+
+                    <!-- Gallery Card 4 -->
+                    <div class="bg-white rounded-2xl p-4 shadow-lg border-2 border-purple-200 bouncy text-center flex flex-col items-center">
+                        <img src="https://images.unsplash.com/photo-1618842676088-c4d48a6a7c9d?q=80&w=400&auto=format&fit=crop" 
+                             alt="Quiz Zone" 
+                             class="w-full h-36 object-cover rounded-xl mb-3 shadow-sm"
+                             onerror="this.src='https://placehold.co/400x200/E1BEE7/6A1B9A?text=Quiz+Game';">
+                        <h4 class="font-bold text-purple-700">ဉာဏ်စမ်းဂိမ်း ၄ မျိုး</h4>
+                        <p class="text-xs text-gray-500 mt-1">အသံနားထောင်၍ မှန်အောင်ဖြေဆိုပါ</p>
+                        <button onclick="switchTab('quiz')" class="mt-3 bg-purple-600 text-white text-xs px-4 py-2 rounded-xl font-bold hover:bg-purple-700">
+                            သွားရောက်မည် ➔
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. ENGLISH SECTION (A-Z) -->
+        <section id="section-en" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-5 md:p-8 shadow-xl border-4 border-appGreenLight mb-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 border-b-2 border-appPinkLight pb-4">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-appGreenDark flex items-center gap-2">
+                            <span>🔤</span> အင်္ဂလိပ် အက္ခရာ လေ့ကျင့်ခန်း (A to Z)
+                        </h2>
+                        <p class="text-gray-600 text-sm md:text-base">အရိပ်အတိုင်း ရေးဆွဲပါ သို့မဟုတ် "လေ့ကျင့်မည်" နှိပ်၍ အလွတ်ရေးပါ!</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openChartTab('en')" class="bg-indigo-600 text-white px-4 py-2 rounded-full font-bold shadow-md hover:bg-indigo-700 bouncy text-xs sm:text-sm flex items-center gap-1">
+                            📊 A-Z ဇယားအပြည့်ကြည့်မည်
+                        </button>
+                        <div class="flex items-center gap-1 bg-appPinkLight px-3 py-1.5 rounded-full border border-appPink text-xs sm:text-sm font-bold text-appPinkDark" id="en-progress-text">
+                            A
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: Letters Grid (A-Z) -->
+                    <div class="lg:col-span-7 bg-appBg p-4 rounded-2xl border-2 border-appGreen">
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3" id="en-letters-grid">
+                            <!-- Dynamically generated -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Tracing Canvas -->
+                    <div class="lg:col-span-5 flex flex-col items-center bg-emerald-50 p-5 rounded-2xl border-2 border-appGreen shadow-inner">
+                        <div class="text-center mb-2">
+                            <span id="en-selected-letter" class="text-5xl font-bold text-appGreenDark font-play">A a</span>
+                            <p id="en-selected-word" class="text-base font-semibold text-appPinkDark mt-1">A for Apple (အဲပဲ့လ် 🍎)</p>
+                        </div>
+
+                        <div class="flex flex-wrap justify-center gap-2 mb-3">
+                            <button onclick="playCurrentEnAudio()" class="bg-appGreen text-white px-3 py-1.5 rounded-full font-bold shadow-md hover:bg-appGreenDark bouncy flex items-center gap-1 text-xs">
+                                <i class="fa-solid fa-volume-high"></i> အသံဖွင့်မည်
+                            </button>
+                            <button id="en-mode-btn" onclick="togglePracticeMode('en')" class="bg-purple-600 text-white px-3 py-1.5 rounded-full font-bold shadow-md hover:bg-purple-700 bouncy text-xs flex items-center gap-1">
+                                ✏️ လေ့ကျင့်မည် (အလွတ်)
+                            </button>
+                        </div>
+
+                        <!-- Canvas Drawing Controls -->
+                        <div class="w-full max-w-[280px] bg-white p-2 rounded-xl border border-appGreenLight mb-2 flex items-center justify-between gap-1 text-xs">
+                            <div class="flex items-center gap-1">
+                                <span class="font-bold text-gray-600">အရောင်:</span>
+                                <input type="color" id="en-color-picker" value="#2E7D32" onchange="setCanvasColor('en', this.value)" class="w-7 h-7 rounded cursor-pointer border-none">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span class="font-bold text-gray-600">ဆိုဒ်:</span>
+                                <select id="en-brush-size" onchange="setBrushSize('en', this.value)" class="bg-gray-100 rounded px-1 py-0.5 border">
+                                    <option value="6">သေး</option>
+                                    <option value="12" selected>အလယ်</option>
+                                    <option value="18">ကြီး</option>
+                                </select>
+                            </div>
+                            <button onclick="toggleEraser('en')" id="en-eraser-btn" class="bg-gray-200 text-gray-700 px-2 py-1 rounded font-bold hover:bg-gray-300">
+                                🧹 ဖျက်ခဲ
+                            </button>
+                        </div>
+
+                        <!-- Tracing Box with Duolingo-style Shadow Template & Stroke Guides -->
+                        <div class="w-full flex flex-col items-center">
+                            <div class="canvas-container bg-white rounded-xl border-4 border-dashed border-appGreen p-1 shadow-md w-full max-w-[280px] relative">
+                                <!-- Shadow Template Guide -->
+                                <div id="en-shadow-guide" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-gray-300 font-bold font-play select-none text-8xl opacity-30">
+                                    <span id="en-shadow-text">A</span>
+                                </div>
+                                
+                                <!-- Duolingo Interactive Stroke Overlay -->
+                                <div id="en-duo-overlay" class="absolute inset-0 pointer-events-none z-20 flex flex-col items-center justify-center">
+                                    <div id="en-arrow-guide" class="absolute top-4 left-1/2 -translate-x-1/2 text-appPinkDark text-lg stroke-arrow font-bold flex flex-col items-center">
+                                        <div class="duo-stroke-dot bg-appPink text-white border-2 border-white">1</div>
+                                        <span class="text-[10px] bg-white/90 px-2 py-0.5 rounded-full shadow text-appGreenDark font-bold mt-1">အောက်သို့ဆွဲပါ ⬇️</span>
+                                    </div>
+                                </div>
+
+                                <canvas id="en-canvas" width="270" height="220" class="cursor-crosshair w-full h-[220px] rounded-lg relative z-10"></canvas>
+                            </div>
+
+                            <p id="en-mode-status" class="text-xs font-bold text-appGreenDark mt-2">✨ Duolingo စုတ်ချက်အလိုက် ရေးနည်း လမ်းညွှန်ထားပါသည်</p>
+
+                            <div class="flex gap-3 mt-3 w-full max-w-[280px]">
+                                <button onclick="clearCanvas('en-canvas')" class="flex-1 bg-red-400 hover:bg-red-500 text-white font-bold py-2 rounded-xl shadow bouncy text-sm">
+                                    <i class="fa-solid fa-trash"></i> ဖျက်မည်
+                                </button>
+                                <button onclick="rewardStar()" class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 rounded-xl shadow bouncy text-sm">
+                                    <i class="fa-solid fa-star"></i> ပြီးပြီ!
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. MYANMAR SECTION (က-အ) -->
+        <section id="section-mm" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-5 md:p-8 shadow-xl border-4 border-appPinkLight mb-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 border-b-2 border-appGreenLight pb-4">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-appPinkDark flex items-center gap-2">
+                            <span>🇲🇲</span> မြန်မာ အက္ခရာ လေ့ကျင့်ခန်း (က မှ အ အထိ)
+                        </h2>
+                        <p class="text-gray-600 text-sm md:text-base">Duolingo စုတ်ချက် အစီအစဉ်အတိုင်း ရေးဆွဲပါ သို့မဟုတ် အလွတ်လေ့ကျင့်ပါ</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openChartTab('mm')" class="bg-indigo-600 text-white px-4 py-2 rounded-full font-bold shadow-md hover:bg-indigo-700 bouncy text-xs sm:text-sm flex items-center gap-1">
+                            📊 က-အ ဇယားအပြည့်ကြည့်မည်
+                        </button>
+                        <div class="flex items-center gap-1 bg-appGreenLight px-3 py-1.5 rounded-full border border-appGreen text-xs sm:text-sm font-bold text-appGreenDark" id="mm-progress-text">
+                            က
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: Letters Grid (က-အ) -->
+                    <div class="lg:col-span-7 bg-appBg p-4 rounded-2xl border-2 border-appGreen">
+                        <div class="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3" id="mm-letters-grid">
+                            <!-- Dynamically generated -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Tracing Canvas -->
+                    <div class="lg:col-span-5 flex flex-col items-center bg-pink-50 p-5 rounded-2xl border-2 border-appPink shadow-inner">
+                        <div class="text-center mb-2">
+                            <span id="mm-selected-letter" class="text-5xl font-bold text-appPinkDark">က</span>
+                            <p id="mm-selected-word" class="text-base font-semibold text-appGreenDark mt-1">က - ကလေး (👶)</p>
+                        </div>
+
+                        <div class="flex flex-wrap justify-center gap-2 mb-3">
+                            <button onclick="playCurrentMmAudio()" class="bg-appPinkDark text-white px-3 py-1.5 rounded-full font-bold shadow-md hover:bg-pink-600 bouncy flex items-center gap-1 text-xs">
+                                <i class="fa-solid fa-volume-high"></i> အသံဖွင့်မည်
+                            </button>
+                            <button id="mm-mode-btn" onclick="togglePracticeMode('mm')" class="bg-purple-600 text-white px-3 py-1.5 rounded-full font-bold shadow-md hover:bg-purple-700 bouncy text-xs flex items-center gap-1">
+                                ✏️ လေ့ကျင့်မည် (အလွတ်)
+                            </button>
+                        </div>
+
+                        <!-- Canvas Drawing Controls -->
+                        <div class="w-full max-w-[280px] bg-white p-2 rounded-xl border border-appPinkLight mb-2 flex items-center justify-between gap-1 text-xs">
+                            <div class="flex items-center gap-1">
+                                <span class="font-bold text-gray-600">အရောင်:</span>
+                                <input type="color" id="mm-color-picker" value="#C2185B" onchange="setCanvasColor('mm', this.value)" class="w-7 h-7 rounded cursor-pointer border-none">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span class="font-bold text-gray-600">ဆိုဒ်:</span>
+                                <select id="mm-brush-size" onchange="setBrushSize('mm', this.value)" class="bg-gray-100 rounded px-1 py-0.5 border">
+                                    <option value="6">သေး</option>
+                                    <option value="12" selected>အလယ်</option>
+                                    <option value="18">ကြီး</option>
+                                </select>
+                            </div>
+                            <button onclick="toggleEraser('mm')" id="mm-eraser-btn" class="bg-gray-200 text-gray-700 px-2 py-1 rounded font-bold hover:bg-gray-300">
+                                🧹 ဖျက်ခဲ
+                            </button>
+                        </div>
+
+                        <div class="w-full flex flex-col items-center">
+                            <div class="canvas-container bg-white rounded-xl border-4 border-dashed border-appPink p-1 shadow-md w-full max-w-[280px] relative">
+                                <!-- Shadow Template Guide -->
+                                <div id="mm-shadow-guide" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-gray-300 font-bold select-none text-8xl opacity-30">
+                                    <span id="mm-shadow-text">က</span>
+                                </div>
+                                <!-- Duolingo Interactive Stroke Overlay -->
+                                <div id="mm-duo-overlay" class="absolute inset-0 pointer-events-none z-20 flex flex-col items-center justify-center">
+                                    <div id="mm-arrow-guide" class="absolute top-4 left-1/2 -translate-x-1/2 text-appGreenDark text-lg stroke-arrow font-bold flex flex-col items-center">
+                                        <div class="duo-stroke-dot bg-appGreen text-white border-2 border-white">1</div>
+                                        <span class="text-[10px] bg-white/90 px-2 py-0.5 rounded-full shadow text-appPinkDark font-bold mt-1">ဝိုင်း၍ရေးပါ 🔄</span>
+                                    </div>
+                                </div>
+
+                                <canvas id="mm-canvas" width="270" height="220" class="cursor-crosshair w-full h-[220px] rounded-lg relative z-10"></canvas>
+                            </div>
+
+                            <p id="mm-mode-status" class="text-xs font-bold text-appPinkDark mt-2">✨ Duolingo စုတ်ချက်အလိုက် ရေးနည်း လမ်းညွှန်ထားပါသည်</p>
+
+                            <div class="flex gap-3 mt-3 w-full max-w-[280px]">
+                                <button onclick="clearCanvas('mm-canvas')" class="flex-1 bg-red-400 hover:bg-red-500 text-white font-bold py-2 rounded-xl shadow bouncy text-sm">
+                                    <i class="fa-solid fa-trash"></i> ဖျက်မည်
+                                </button>
+                                <button onclick="rewardStar()" class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 rounded-xl shadow bouncy text-sm">
+                                    <i class="fa-solid fa-star"></i> ပြီးပြီ!
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. NUMBERS SECTION (1-100 & WRITING PRACTICE) -->
+        <section id="section-num" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-5 md:p-8 shadow-xl border-4 border-yellow-200 mb-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 border-b-2 border-yellow-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-yellow-600 flex items-center gap-2">
+                            <span>🔢</span> ဂဏန်းများ လေ့ကျင့်ခန်း (1 မှ 100)
+                        </h2>
+                        <p class="text-gray-600 text-sm md:text-base">ဂဏန်း ရေးနည်းအမှတ်စဉ်များအတိုင်း ရေးဆွဲပါ သို့မဟုတ် အလွတ်လေ့ကျင့်ပါ</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openChartTab('num')" class="bg-indigo-600 text-white px-4 py-2 rounded-full font-bold shadow-md hover:bg-indigo-700 bouncy text-xs sm:text-sm flex items-center gap-1">
+                            📊 ၁-၁၀၀ ဂဏန်းဇယား ကြည့်မည်
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: Number Selector Grid (1-20 quick tracer, button to 1-100) -->
+                    <div class="lg:col-span-7 bg-amber-50 p-4 rounded-2xl border-2 border-yellow-300 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-yellow-800 text-sm sm:text-base">အခြေခံ ဂဏန်းများ (1-20 ရေးဆွဲရန်)</h3>
+                                <span class="text-xs text-gray-500 font-semibold">၁ မှ ၂၀</span>
+                            </div>
+                            <div class="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3" id="numbers-grid">
+                                <!-- Dynamically generated -->
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-white rounded-xl border border-yellow-200 text-center">
+                            <p class="text-xs text-gray-600 mb-2">1 မှ 100 အထိ ဂဏန်း အားလုံးကို အသံထွက်ဖြင့် လေ့ကျင့်လိုပါက ဇယားကို ဖွင့်ပါ</p>
+                            <button onclick="openChartTab('num')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl font-bold text-xs shadow bouncy">
+                                🔢 1 မှ 100 အပြည့်အစုံ ဇယားသို့သွားရန် ➔
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Visual Counting & Tracing -->
+                    <div class="lg:col-span-5 flex flex-col items-center bg-yellow-50 p-5 rounded-2xl border-2 border-yellow-400 shadow-inner">
+                        <div class="text-center mb-2">
+                            <div class="flex items-center justify-center gap-4">
+                                <span id="num-display-en" class="text-4xl font-bold text-appGreenDark font-play">1</span>
+                                <span class="text-xl text-gray-400">/</span>
+                                <span id="num-display-mm" class="text-4xl font-bold text-appPinkDark">၁</span>
+                            </div>
+                            <p id="num-display-word" class="text-base font-bold text-yellow-700 mt-1">One - တစ် (1)</p>
+                        </div>
+
+                        <!-- Countable Items Display -->
+                        <div id="num-items-container" class="flex flex-wrap items-center justify-center gap-1.5 my-1 p-2 bg-white rounded-xl border border-yellow-200 min-h-[48px] max-h-[80px] overflow-y-auto w-full max-w-[280px]">
+                        </div>
+
+                        <div class="flex flex-wrap justify-center gap-2 mb-2">
+                            <button onclick="playCurrentNumAudio()" class="bg-yellow-500 text-white px-3 py-1 rounded-full font-bold shadow hover:bg-yellow-600 bouncy text-xs">
+                                <i class="fa-solid fa-volume-high"></i> အသံဖွင့်မည်
+                            </button>
+                            <button id="num-mode-btn" onclick="togglePracticeMode('num')" class="bg-purple-600 text-white px-3 py-1 rounded-full font-bold shadow hover:bg-purple-700 bouncy text-xs">
+                                ✏️ လေ့ကျင့်မည် (အလွတ်)
+                            </button>
+                        </div>
+
+                        <!-- Canvas Drawing Controls -->
+                        <div class="w-full max-w-[280px] bg-white p-2 rounded-xl border border-yellow-300 mb-2 flex items-center justify-between gap-1 text-xs">
+                            <div class="flex items-center gap-1">
+                                <span class="font-bold text-gray-600">အရောင်:</span>
+                                <input type="color" id="num-color-picker" value="#D97706" onchange="setCanvasColor('num', this.value)" class="w-7 h-7 rounded cursor-pointer border-none">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span class="font-bold text-gray-600">ဆိုဒ်:</span>
+                                <select id="num-brush-size" onchange="setBrushSize('num', this.value)" class="bg-gray-100 rounded px-1 py-0.5 border">
+                                    <option value="6">သေး</option>
+                                    <option value="12" selected>အလယ်</option>
+                                    <option value="18">ကြီး</option>
+                                </select>
+                            </div>
+                            <button onclick="toggleEraser('num')" id="num-eraser-btn" class="bg-gray-200 text-gray-700 px-2 py-1 rounded font-bold hover:bg-gray-300">
+                                🧹 ဖျက်ခဲ
+                            </button>
+                        </div>
+
+                        <div class="w-full flex flex-col items-center">
+                            <div class="canvas-container bg-white rounded-xl border-4 border-dashed border-yellow-400 p-1 shadow-md w-full max-w-[280px] relative">
+                                <!-- Shadow Template Guide -->
+                                <div id="num-shadow-guide" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-gray-300 font-bold select-none text-7xl opacity-30">
+                                    <span id="num-shadow-text">1 / ၁</span>
+                                </div>
+                                <!-- Duolingo Interactive Stroke Overlay -->
+                                <div id="num-duo-overlay" class="absolute inset-0 pointer-events-none z-20 flex flex-col items-center justify-center">
+                                    <div id="num-arrow-guide" class="absolute top-3 left-1/2 -translate-x-1/2 text-yellow-600 text-lg stroke-arrow font-bold opacity-80 flex flex-col items-center">
+                                        <div class="duo-stroke-dot bg-yellow-500 text-white border-2 border-white">1</div>
+                                        <span class="text-[10px] bg-white/90 px-2 py-0.5 rounded-full shadow text-yellow-800 font-bold mt-1">အောက်သို့ဆွဲပါ ⬇️</span>
+                                    </div>
+                                </div>
+
+                                <canvas id="num-canvas" width="270" height="200" class="cursor-crosshair w-full h-[200px] rounded-lg relative z-10"></canvas>
+                            </div>
+
+                            <p id="num-mode-status" class="text-xs font-bold text-yellow-700 mt-2">✨ Duolingo စုတ်ချက်အလိုက် ရေးနည်း လမ်းညွှန်ထားပါသည်</p>
+
+                            <div class="flex gap-3 mt-2 w-full max-w-[280px]">
+                                <button onclick="clearCanvas('num-canvas')" class="flex-1 bg-red-400 hover:bg-red-500 text-white font-bold py-1.5 rounded-xl shadow bouncy text-xs">
+                                    <i class="fa-solid fa-trash"></i> ဖျက်မည်
+                                </button>
+                                <button onclick="rewardStar()" class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-1.5 rounded-xl shadow bouncy text-xs">
+                                    <i class="fa-solid fa-star"></i> ပြီးပြီ!
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. ALL CHARTS TAB (A-Z, KAGYI TO AR, 1 TO 100) -->
+        <section id="section-charts" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-5 md:p-8 shadow-xl border-4 border-indigo-200 mb-8">
+                <!-- Sub Navigation Tabs for Charts -->
+                <div class="flex flex-wrap justify-center gap-2 mb-6 border-b-2 border-indigo-100 pb-4">
+                    <button onclick="switchSubChart('en')" id="subchart-btn-en" class="subchart-btn bg-indigo-600 text-white px-4 py-2.5 rounded-2xl font-bold shadow bouncy text-xs sm:text-sm border-2 border-indigo-700">
+                        🔤 A to Z Chart
+                    </button>
+                    <button onclick="switchSubChart('mm')" id="subchart-btn-mm" class="subchart-btn bg-white text-appPinkDark px-4 py-2.5 rounded-2xl font-bold shadow bouncy text-xs sm:text-sm border-2 border-appPink">
+                        🇲🇲 က မှ အ ဗျည်း ၃၃ လုံး ဇယား
+                    </button>
+                    <button onclick="switchSubChart('num')" id="subchart-btn-num" class="subchart-btn bg-white text-yellow-700 px-4 py-2.5 rounded-2xl font-bold shadow bouncy text-xs sm:text-sm border-2 border-yellow-400">
+                        🔢 ၁ မှ ၁၀၀ အထိ ဂဏန်း ဇယား
+                    </button>
+                </div>
+
+                <!-- A-Z Chart View -->
+                <div id="subchart-view-en" class="subchart-view block">
+                    <div class="text-center mb-4">
+                        <h3 class="text-2xl font-bold text-appGreenDark">အင်္ဂလိပ် အက္ခရာ A မှ Z ဇယား (A to Z Chart)</h3>
+                        <p class="text-xs sm:text-sm text-gray-500">ကတ်တစ်ခုစီကို နှိပ်၍ အသံထွက် နားထောင်နိုင်ပါသည်။</p>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3" id="az-chart-grid">
+                        <!-- Dynamically filled -->
+                    </div>
+                </div>
+
+                <!-- Ka-Gyi to Ar Chart View -->
+                <div id="subchart-view-mm" class="subchart-view hidden">
+                    <div class="text-center mb-4">
+                        <h3 class="text-2xl font-bold text-appPinkDark">မြန်မာ ဗျည်း ၃၃ လုံး ဇယား (က မှ အ အထိ)</h3>
+                        <p class="text-xs sm:text-sm text-gray-500">ကတ်တစ်ခုစီကို နှိပ်၍ အသံထွက် နားထောင်နိုင်ပါသည်။</p>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3" id="mm-chart-grid">
+                        <!-- Dynamically filled -->
+                    </div>
+                </div>
+
+                <!-- 1 to 100 Numbers Chart View -->
+                <div id="subchart-view-num" class="subchart-view hidden">
+                    <div class="text-center mb-4">
+                        <h3 class="text-2xl font-bold text-yellow-700">ဂဏန်း ၁ မှ ၁၀၀ ဇယား (1 to 100 Chart)</h3>
+                        <p class="text-xs sm:text-sm text-gray-500">ဂဏန်းတစ်ခုစီကို နှိပ်ပါက မြန်မာ/အင်္ဂလိပ် အသံထွက် ထွက်ပါမည်။</p>
+                    </div>
+                    <div class="grid grid-cols-5 sm:grid-cols-10 gap-1.5 sm:gap-2 max-w-5xl mx-auto" id="num-100-chart-grid">
+                        <!-- Dynamically filled 1 to 100 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. QUIZ ZONE (4 CATEGORIZED MODULES WITH AUDIO + MYANMAR PROMPTS) -->
+        <section id="section-quiz" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-5 md:p-8 shadow-xl border-4 border-purple-200 mb-8 max-w-4xl mx-auto">
+                <div class="text-center mb-6 border-b-2 border-purple-100 pb-4">
+                    <h2 class="text-3xl font-bold text-purple-700 flex items-center justify-center gap-2">
+                        <span>🧩</span> ဉာဏ်စမ်းဂိမ်း (Quiz Zone)
+                    </h2>
+                    <p class="text-gray-600 mt-1">အောက်ပါ အပိုင်း ၄ မျိုးအနက် နှစ်သက်ရာကို ရွေးချယ်၍ လေ့ကျင့်ပါ</p>
+                </div>
+
+                <!-- 4 Quiz Category Selectors -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    <button onclick="setQuizCategory('en')" id="quiz-cat-en" class="quiz-cat-btn bg-appGreen text-white p-3 rounded-2xl font-bold shadow bouncy text-xs sm:text-sm border-2 border-appGreenDark">
+                        🔤 အင်္ဂလိပ် (A-Z)
+                    </button>
+                    <button onclick="setQuizCategory('mm')" id="quiz-cat-mm" class="quiz-cat-btn bg-white text-appPinkDark p-3 rounded-2xl font-bold shadow bouncy text-xs sm:text-sm border-2 border-appPink">
+                        🇲🇲 မြန်မာ (က-အ)
+                    </button>
+                    <button onclick="setQuizCategory('num')" id="quiz-cat-num" class="quiz-cat-btn bg-white text-yellow-700 p-3 rounded-2xl font-bold shadow bouncy text-xs sm:text-sm border-2 border-yellow-400">
+                        🔢 ဂဏန်းများ (1-100)
+                    </button>
+                    <button onclick="setQuizCategory('mixed')" id="quiz-cat-mixed" class="quiz-cat-btn bg-white text-purple-700 p-3 rounded-2xl font-bold shadow bouncy text-xs sm:text-sm border-2 border-purple-300">
+                        🎲 ရောနှောဉာဏ်စမ်း
+                    </button>
+                </div>
+
+                <!-- Quiz Score Dashboard -->
+                <div class="flex justify-around items-center bg-purple-50 p-4 rounded-2xl border-2 border-purple-200 mb-6">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 font-bold">ရမှတ် (Score)</p>
+                        <p id="quiz-score" class="text-3xl font-bold text-appGreenDark">0</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 font-bold">ရရှိထားသော ကြယ်</p>
+                        <p id="quiz-stars" class="text-3xl font-bold text-yellow-500">⭐ 0</p>
+                    </div>
+                </div>
+
+                <!-- Active Question Card -->
+                <div class="bg-pink-50 p-6 rounded-2xl border-2 border-appPink text-center shadow-inner mb-6">
+                    <div class="mb-3">
+                        <button onclick="playQuizQuestionAudio()" class="bg-appGreen text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-appGreenDark bouncy flex items-center justify-center gap-3 mx-auto text-base md:text-lg border-2 border-white">
+                            <i class="fa-solid fa-volume-high text-2xl"></i>
+                            <span id="quiz-audio-btn-text">မေးခွန်းအသံ ပြန်နားထောင်မည် 🔊</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Written Myanmar Text Prompt -->
+                    <p id="quiz-question-text" class="text-lg md:text-xl font-bold text-gray-800 mt-3 bg-white p-3 rounded-xl border border-appPinkLight inline-block">
+                        "အောက်ပါတို့အနက်မှ မှန်ကန်သော အဖြေကို ရွေးချယ်ပါ"
+                    </p>
+                </div>
+
+                <!-- Choice Options Grid -->
+                <div class="grid grid-cols-2 gap-4" id="quiz-options-container">
+                    <!-- Dynamic option buttons -->
+                </div>
+
+                <!-- Next Question Button -->
+                <div class="mt-6 text-center">
+                    <button onclick="generateNewQuiz()" class="bg-purple-600 text-white px-8 py-3 rounded-full font-bold text-lg shadow-md hover:bg-purple-700 bouncy">
+                        နောက်မေးခွန်းတစ်ခု ➔
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. SPECIAL PROFILE PAGE (Aye Mya Thadar Aung) -->
+        <section id="section-profile" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-xl border-4 border-pink-200 mb-8 max-w-2xl mx-auto">
+                <div class="text-center">
+                    <div class="relative inline-block mb-4">
+                        <div class="w-36 h-36 md:w-44 md:h-44 rounded-full bg-gradient-to-tr from-appPink to-appGreen p-2 shadow-xl mx-auto">
+                            <img src="ayemya.jpg" 
+                                 alt="Aye Mya Thadar Aung Profile" 
+                                 class="w-full h-full object-cover rounded-full border-4 border-white shadow-inner"
+                                 onerror="this.src='https://placehold.co/200x200/FFB6C1/ffffff?text=Aye+Mya';">
+                        </div>
+                        <span class="absolute bottom-1 right-2 bg-yellow-400 text-white p-2 rounded-full shadow-lg text-xl pulse-star">
+                            👑
+                        </span>
+                    </div>
+
+                    <h2 class="text-3xl font-bold text-purple-700 font-play">Aye Mya Thadar Aung</h2>
+                    <p class="text-lg font-bold text-appPinkDark mt-1">အေးမြသဒ္ဒါအောင် 👧🏻✨</p>
+                    <p class="text-sm text-gray-500 mt-1">လိမ္မာယဉ်ကျေးသော လိမ္မာသီးလေး</p>
+
+                    <div class="mt-6 bg-purple-50 p-4 rounded-2xl border border-purple-200 text-left space-y-3">
+                        <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
+                            <span class="font-bold text-gray-700">🏆 သင်ကြားရေးအဆင့်:</span>
+                            <span class="font-bold text-appGreenDark">ထူးချွန်သူ (Smart Kids)</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
+                            <span class="font-bold text-gray-700">🌟 စုစုပေါင်း ကြယ်ပွင့်:</span>
+                            <span class="font-bold text-yellow-500 text-lg" id="profile-stars-count">0 Pts</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
+                            <span class="font-bold text-gray-700">📚 သင်ခန်းစာများ:</span>
+                            <span class="font-bold text-purple-600">A-Z, က-အ, ၁-၁၀၀ ဂဏန်း ဇယားများ</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 bg-appGreenLight/40 p-4 rounded-2xl border border-appGreen text-appGreenDark font-bold text-sm">
+                        💬 "အေးမြသဒ္ဒါအောင် ရေ... စာများကို နေ့တိုင်း ပျော်ပျော်ရွှင်ရွှင် ကြိုးစားလေ့ကျင့်သွားပါနော်! 🍏🩷"
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t-2 border-appPinkLight py-4 text-center text-xs md:text-sm text-gray-500">
+        <p>© 2026 ကလေးတို့ ပျော်ရွှင်ဖွယ် သင်ယူရေး ကမ္ဘာ - Aye Mya Thadar Aung Special Edition</p>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        /* DATA DEFINITIONS */
+        const englishData = [
+            { letter: 'A', word: 'Apple', mmWord: 'အဲပဲ့လ် 🍎', soundText: 'A for Apple', arrow: '⬇️ အောက်သို့ဆွဲပါ' },
+            { letter: 'B', word: 'Ball', mmWord: 'ဘောလုံး ⚽', soundText: 'B for Ball', arrow: '⬇️ အောက်ဆွဲပြီး ဝိုင်းပါ' },
+            { letter: 'C', word: 'Cat', mmWord: 'ကြောင်လေး 🐱', soundText: 'C for Cat', arrow: '↩️ ဘယ်ဘက်သို့ ကွေးပါ' },
+            { letter: 'D', word: 'Dog', mmWord: 'ခွေးလေး 🐶', soundText: 'D for Dog', arrow: '⬇️ အောက်ဆွဲပြီး ဝိုင်းပါ' },
+            { letter: 'E', word: 'Elephant', mmWord: 'ဆင်ကြီး 🐘', soundText: 'E for Elephant', arrow: '⬇️ အောက်ဆွဲပြီး အကွက်ဖော်ပါ' },
+            { letter: 'F', word: 'Fish', mmWord: 'ငါးလေး 🐟', soundText: 'F for Fish', arrow: '⬇️ အောက်ဆွဲပြီး မျဉ်းတိုဆွဲပါ' },
+            { letter: 'G', word: 'Girl', mmWord: 'မိန်းကလေး 👧', soundText: 'G for Girl', arrow: '↩️ ဝိုင်း၍ အထဲဝင်ပါ' },
+            { letter: 'H', word: 'Hat', mmWord: 'ဦးထုပ် 👒', soundText: 'H for Hat', arrow: '⬇️ မျဉ်းနှစ်ကြောင်းဆက်ပါ' },
+            { letter: 'I', word: 'Ice cream', mmWord: 'ရေခဲမုန့် 🍦', soundText: 'I for Ice cream', arrow: '⬇️ အောက်သို့ တဖြောင့်တည်းဆွဲပါ' },
+            { letter: 'J', word: 'Juice', mmWord: 'ဖျော်ရည် 🧃', soundText: 'J for Juice', arrow: '⬇️ အောက်ဆွဲ၍ ကောက်ပါ' },
+            { letter: 'K', word: 'Kite', mmWord: 'စွန့် 🪁', soundText: 'K for Kite', arrow: '⬇️ အောက်ဆွဲ စေ့ဆွဲပါ' },
+            { letter: 'L', word: 'Lion', mmWord: 'ခြင်္သေ့ 🦁', soundText: 'L for Lion', arrow: '⬇️ အောက်ဆွဲ ညာကွေးပါ' },
+            { letter: 'M', word: 'Monkey', mmWord: 'မျောက် 🐒', soundText: 'M for Monkey', arrow: '⬇️ အထက်အောက် ဆွဲပါ' },
+            { letter: 'N', word: 'Nest', mmWord: 'ငှက်သိုက် 🪹', soundText: 'N for Nest', arrow: '⬇️ စောင်းဆွဲ အထက်ဆွဲပါ' },
+            { letter: 'O', word: 'Orange', mmWord: 'လိမ္မော်သီး 🍊', soundText: 'O for Orange', arrow: '🔄 ဝိုင်းဝိုင်းဆွဲပါ' },
+            { letter: 'P', word: 'Pen', mmWord: 'ဘောပင် 🖊️', soundText: 'P for Pen', arrow: '⬇️ အောက်ဆွဲ အထက်ဝိုင်းပါ' },
+            { letter: 'Q', word: 'Queen', mmWord: 'မိဖုရား 👸', soundText: 'Q for Queen', arrow: '🔄 ဝိုင်းပြီး ဒေါက်ဆွဲပါ' },
+            { letter: 'R', word: 'Rabbit', mmWord: 'ယုန်လေး 🐰', soundText: 'R for Rabbit', arrow: '⬇️ အောက်ဆွဲ စောင်းဆွဲပါ' },
+            { letter: 'S', word: 'Sun', mmWord: 'နေမင်း ☀️', soundText: 'S for Sun', arrow: '🐍 မြွေတွန့်ဆွဲပါ' },
+            { letter: 'T', word: 'Tree', mmWord: 'သစ်ပင် 🌳', soundText: 'T for Tree', arrow: '⬇️ အထက်ပိတ် အောက်ဆွဲပါ' },
+            { letter: 'U', word: 'Umbrella', mmWord: 'ထီး ☂️', soundText: 'U for Umbrella', arrow: '∪ အောက်ခွက်ဆွဲပါ' },
+            { letter: 'V', word: 'Van', mmWord: 'ကား 🚐', soundText: 'V for Van', arrow: '∨ စောင်းဆွဲ တက်ဆွဲပါ' },
+            { letter: 'W', word: 'Water', mmWord: 'ရေ 💧', soundText: 'W for Water', arrow: 'WW အတက်အဆွဲဆွဲပါ' },
+            { letter: 'X', word: 'Xylophone', mmWord: 'လက်ကွက်တူရိယာ 🎼', soundText: 'X for Xylophone', arrow: '❌ ကြက်ခြေခတ်ဆွဲပါ' },
+            { letter: 'Y', word: 'Yo-yo', mmWord: 'ယိုယို 🪀', soundText: 'Y for Yo-yo', arrow: 'Ү ခွဆွဲ အောက်ဆွဲပါ' },
+            { letter: 'Z', word: 'Zebra', mmWord: 'မြင်းကျား 🦓', soundText: 'Z for Zebra', arrow: '⚡ ဇိဂ်ဇက်ဆွဲပါ' }
+        ];
+
+        const myanmarData = [
+            { letter: 'က', word: 'ကလေး', icon: '👶', sound: 'က ကြီး', arrow: '🔄 ဝိုင်း၍ရေးပါ' },
+            { letter: 'ခ', word: 'ခွေးလေး', icon: '🐶', sound: 'ခ ကွေး', arrow: '🔄 အထက်ဝိုင်းဆွဲပါ' },
+            { letter: 'ဂ', word: 'ဂဏန်း', icon: '🦀', sound: 'ဂ ငယ်', arrow: '↩️ ဘယ်ကွေးဆွဲပါ' },
+            { letter: 'ဃ', word: 'ဃေါင်းလောင်း', icon: '🔔', sound: 'ဃ ကြီး', arrow: '🔄 ဝိုင်း၍ ချိတ်ဆွဲပါ' },
+            { letter: 'င', word: 'ငါးလေး', icon: '🐟', sound: 'င', arrow: '↪️ ညာဝိုင်းဆွဲပါ' },
+            { letter: 'စ', word: 'စာကလေး', icon: '🐦', sound: 'စ လုံး', arrow: '🔄 စက်ဝိုင်းဆွဲပါ' },
+            { letter: 'ဆ', word: 'ဆင်ကြီး', icon: '🐘', sound: 'ဆ လိမ်', arrow: '🌀 တွန့်၍ဆွဲပါ' },
+            { letter: 'ဇ', word: 'ဇွန်း', icon: '🥄', sound: 'ဇ ွဲ', arrow: '🔄 ဝိုင်း၍ အောက်ဆွဲပါ' },
+            { letter: 'ဈ', word: 'ဈေး', icon: '🛒', sound: 'ဈ မြဉ်းဆွဲ', arrow: '✍️ မြဉ်းဆွဲပါ' },
+            { letter: 'ည', word: 'ညရောင်ခြည်', icon: '🌙', sound: 'ည', arrow: '🔄 ညဆွဲပါ' },
+            { letter: 'ဋ', word: 'ဋာပနာ', icon: '🛕', sound: 'ဋ သန်လျင်းချိတ်', arrow: '🪝 ချိတ်ဆွဲပါ' },
+            { letter: 'ဌ', word: 'ဌာန', icon: '🏢', sound: 'ဌ ဝမ်းဘဲ', arrow: '🦆 ဝမ်းဘဲဆွဲပါ' },
+            { letter: 'ဍ', word: 'ဍရင်ကောက်', icon: '🥁', sound: 'ဍ ရင်ကောက်', arrow: '↩️ ရင်ကောက်ဆွဲပါ' },
+            { letter: 'ဎ', word: 'ဎရေဘုတ်', icon: '🔔', sound: 'ဎ ရေဘုတ်', arrow: '🔔 ရေဘုတ်ဆွဲပါ' },
+            { letter: 'ဏ', word: 'ဏကြီး', icon: '📜', sound: 'ဏ ကြီး', arrow: '📜 ဏကြီးဆွဲပါ' },
+            { letter: 'တ', word: 'တံငါ', icon: '🎣', sound: 'တ ဝမ်းပူ', arrow: '🎈 ဝမ်းပူဆွဲပါ' },
+            { letter: 'ထ', word: 'ထီး', icon: '☂️', sound: 'ထ ဆင်ထွေး', arrow: '🔄 ဝိုင်း၍ဆွဲပါ' },
+            { letter: 'ဒ', word: 'ဒေါင်း', icon: '🦚', sound: 'ဒ ထွေး', arrow: '↪️ ဒထွေးဆွဲပါ' },
+            { letter: 'ဓ', word: 'ဓား', icon: '🗡️', sound: 'ဓ အောက်ခြိုက်', arrow: '🗡️ အောက်ခြိုက်ဆွဲပါ' },
+            { letter: 'န', word: 'နဂါး', icon: '🐉', sound: 'န ငယ်', arrow: '🐉 နငယ်ဆွဲပါ' },
+            { letter: 'ပ', word: 'ပဲသီး', icon: '🫛', sound: 'ပ စောက်', arrow: '🫛 ပစောက်ဆွဲပါ' },
+            { letter: 'ဖ', word: 'ဖားလေး', icon: '🐸', sound: 'ဖ ဦးထုပ်', arrow: '🧢 ဖဦးထုပ်ဆွဲပါ' },
+            { letter: 'ဗ', word: 'ဗျို့', icon: '🥁', sound: 'ဗ ထက်ခြိုက်', arrow: '🥁 ထက်ခြိုက်ဆွဲပါ' },
+            { letter: 'ဘ', word: 'ဘဲလေး', icon: '🦆', sound: 'ဘ ကုန်း', arrow: '🦆 ဘကုန်းဆွဲပါ' },
+            { letter: 'မ', word: 'မီး', icon: '🔥', sound: 'မ', arrow: '🔥 မဆွဲပါ' },
+            { letter: 'ယ', word: 'ယုန်လေး', icon: '🐰', sound: 'ယ ပက်လက်', arrow: '🐰 ယပက်လက်ဆွဲပါ' },
+            { letter: 'ရ', word: 'ရထား', icon: '🚂', sound: 'ရ ကောက်', arrow: '🚂 ရကောက်ဆွဲပါ' },
+            { letter: 'လ', word: 'လမင်း', icon: '🌕', sound: 'လ', arrow: '🌕 လဆွဲပါ' },
+            { letter: 'ဝ', word: 'ဝက်လေး', icon: '🐷', sound: 'ဝ', arrow: '⭕ ဝိုင်းဝိုင်းဆွဲပါ' },
+            { letter: 'သ', word: 'သစ်ပင်', icon: '🌳', sound: 'သ', arrow: '🌳 သဆွဲပါ' },
+            { letter: 'ဟ', word: 'ဟင်း', icon: '🍲', sound: 'ဟ', arrow: '🍲 ဟဆွဲပါ' },
+            { letter: 'ဠ', word: 'ဠကြီး', icon: '🪁', sound: 'ဠ ကြီး', arrow: '🪁 ဠကြီးဆွဲပါ' },
+            { letter: 'အ', word: 'အိမ်', icon: '🏠', sound: 'အ', arrow: '🏠 အဆွဲပါ' }
+        ];
+
+        // Primary numbers 1 to 20 for practice
+        const numbersData = [
+            { en: '1', mm: '၁', word: 'One - တစ်', icon: '🍎', arrow: '⬇️ အောက်သို့ အဖြောင့်ဆွဲပါ' },
+            { en: '2', mm: '၂', word: 'Two - နှစ်', icon: '🍌', arrow: '↩️ ဝိုင်း၍ လှိုင်းဆွဲပါ' },
+            { en: '3', mm: '၃', word: 'Three - သုံး', icon: '⭐️', arrow: '3️⃣ အခွံနှစ်ခုဆွဲပါ' },
+            { en: '4', mm: '၄', word: 'Four - လေး', icon: '🎈', arrow: '4️⃣ ဒေါက်ဆွဲ ပိတ်ဆွဲပါ' },
+            { en: '5', mm: '၅', word: 'Five - ငါး', icon: '🌸', arrow: '5️⃣ အထက်ပိတ် အောက်ဝိုင်းပါ' },
+            { en: '6', mm: '၆', word: 'Six - ခြောက်', icon: '🚗', arrow: '6️⃣ အထက်ကွေး အောက်ဝိုင်းပါ' },
+            { en: '7', mm: '၇', word: 'Seven - ခုနစ်', icon: '🍬', arrow: '7️⃣ အလျားဆွဲ ဒေါက်ဆွဲပါ' },
+            { en: '8', mm: '၈', word: 'Eight - ရှစ်', icon: '🦋', arrow: '8️⃣ ကွင်းနှစ်ခု ဆက်ဆွဲပါ' },
+            { en: '9', mm: '၉', word: 'Nine - ကိုး', icon: '🐥', arrow: '9️⃣ အထက်ဝိုင်း အောက်ဆွဲပါ' },
+            { en: '10', mm: '၁၀', word: 'Ten - တစ်ဆယ်', icon: '🎁', arrow: '🔟 ၁ နှင့် ၀ ပူးတွဲဆွဲပါ' },
+            { en: '11', mm: '၁၁', word: 'Eleven - တစ်ဆယ့်တစ်', icon: '🍭', arrow: '⬇️ ၁ နှင့် ၁ ရေးဆွဲပါ' },
+            { en: '12', mm: '၁၂', word: 'Twelve - တစ်ဆယ့်နှစ်', icon: '🍇', arrow: '⬇️ ၁ နှင့် ၂ ရေးဆွဲပါ' },
+            { en: '13', mm: '၁၃', word: 'Thirteen - တစ်ဆယ့်သုံး', icon: '🍊', arrow: '⬇️ ၁ နှင့် ၃ ရေးဆွဲပါ' },
+            { en: '14', mm: '၁၄', word: 'Fourteen - တစ်ဆယ့်လေး', icon: '🍓', arrow: '⬇️ ၁ နှင့် ၄ ရေးဆွဲပါ' },
+            { en: '15', mm: '၁၅', word: 'Fifteen - တစ်ဆယ့်ငါး', icon: '🍉', arrow: '⬇️ ၁ နှင့် ၅ ရေးဆွဲပါ' },
+            { en: '16', mm: '၁၆', word: 'Sixteen - တစ်ဆယ့်ခြောက်', icon: '🍩', arrow: '⬇️ ၁ နှင့် ၆ ရေးဆွဲပါ' },
+            { en: '17', mm: '၁၇', word: 'Seventeen - တစ်ဆယ့်ခုနစ်', icon: '🍦', arrow: '⬇️ ၁ နှင့် ၇ ရေးဆွဲပါ' },
+            { en: '18', mm: '၁၈', word: 'Eighteen - တစ်ဆယ့်ရှစ်', icon: '🧁', arrow: '⬇️ ၁ နှင့် ၈ ရေးဆွဲပါ' },
+            { en: '19', mm: '၁၉', word: 'Nineteen - တစ်ဆယ့်ကိုး', icon: '🍰', arrow: '⬇️ ၁ နှင့် ၉ ရေးဆွဲပါ' },
+            { en: '20', mm: '၂၀', word: 'Twenty - နှစ်ဆယ်', icon: '🍿', arrow: '⬇️ ၂ နှင့် ၀ ရေးဆွဲပါ' }
+        ];
+
+        /* Utility function to convert English digits to Burmese digits */
+        function toBurmeseDigits(numStr) {
+            const mmDigits = ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'];
+            return String(numStr).replace(/\d/g, d => mmDigits[parseInt(d)]);
+        }
+
+        /* STATE */
+        let currentEnIndex = 0;
+        let currentMmIndex = 0;
+        let currentNumIndex = 0;
+        let activeQuizCat = 'en'; // 'en', 'mm', 'num', 'mixed'
+        let currentQuizQuestion = null;
+        let quizScore = 0;
+        let totalStars = 0;
+
+        // Canvas drawing state per section
+        const canvasState = {
+            en: { color: '#2E7D32', size: 12, isEraser: false },
+            mm: { color: '#C2185B', size: 12, isEraser: false },
+            num: { color: '#D97706', size: 12, isEraser: false }
+        };
+
+        // Practice Mode States (false = Tracing Guide ON, true = Free Practice Blank)
+        const practiceModes = { en: false, mm: false, num: false };
+
+        /* Audio helper */
+        function speakText(text, lang = 'my-MM') {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        /* TAB NAVIGATION */
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-appGreen', 'text-white');
+                btn.classList.add('bg-white');
+            });
+
+            const activeSection = document.getElementById(`section-${tab}`);
+            const activeBtn = document.getElementById(`nav-${tab}`);
+
+            if (activeSection) activeSection.classList.remove('hidden');
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white');
+                activeBtn.classList.add('bg-appGreen', 'text-white');
+            }
+
+            if (tab === 'quiz') {
+                generateNewQuiz();
+            }
+
+            // Ensure canvases fit container when tab opens
+            setTimeout(() => {
+                initCanvasScale('en-canvas');
+                initCanvasScale('mm-canvas');
+                initCanvasScale('num-canvas');
+            }, 100);
+        }
+
+        function openChartTab(subChartName) {
+            switchTab('charts');
+            switchSubChart(subChartName);
+        }
+
+        function switchSubChart(chartType) {
+            document.querySelectorAll('.subchart-view').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.subchart-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'bg-appPinkDark', 'bg-yellow-500', 'text-white');
+                btn.classList.add('bg-white');
+            });
+
+            const activeView = document.getElementById(`subchart-view-${chartType}`);
+            const activeBtn = document.getElementById(`subchart-btn-${chartType}`);
+
+            if (activeView) activeView.classList.remove('hidden');
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white');
+                if (chartType === 'en') activeBtn.classList.add('bg-indigo-600', 'text-white');
+                if (chartType === 'mm') activeBtn.classList.add('bg-appPinkDark', 'text-white');
+                if (chartType === 'num') activeBtn.classList.add('bg-yellow-500', 'text-white');
+            }
+        }
+
+        /* TRACING / FREE PRACTICE TOGGLE */
+        function togglePracticeMode(section) {
+            practiceModes[section] = !practiceModes[section];
+            const isFree = practiceModes[section];
+
+            const guideEl = document.getElementById(`${section}-shadow-guide`);
+            const duoOverlayEl = document.getElementById(`${section}-duo-overlay`);
+            const statusEl = document.getElementById(`${section}-mode-status`);
+            const btnEl = document.getElementById(`${section}-mode-btn`);
+
+            if (isFree) {
+                if (guideEl) guideEl.classList.add('hidden');
+                if (duoOverlayEl) duoOverlayEl.classList.add('hidden');
+                if (statusEl) statusEl.innerText = '✏️ အလွတ်ရေး လေ့ကျင့်ခန်း ပုံစံဖွင့်ထားသည်';
+                if (btnEl) btnEl.innerText = '👁️ Duolingo လမ်းညွှန်ကြည့်မည်';
+            } else {
+                if (guideEl) guideEl.classList.remove('hidden');
+                if (duoOverlayEl) duoOverlayEl.classList.remove('hidden');
+                if (statusEl) statusEl.innerText = '✨ Duolingo စုတ်ချက်အလိုက် ရေးနည်း လမ်းညွှန်ထားပါသည်';
+                if (btnEl) btnEl.innerText = '✏️ လေ့ကျင့်မည် (အလွတ်)';
+            }
+            clearCanvas(`${section}-canvas`);
+        }
+
+        /* CANVAS CONTROLS */
+        function setCanvasColor(section, color) {
+            canvasState[section].color = color;
+            canvasState[section].isEraser = false;
+            updateEraserButtonUI(section);
+        }
+
+        function setBrushSize(section, size) {
+            canvasState[section].size = parseInt(size);
+        }
+
+        function toggleEraser(section) {
+            canvasState[section].isEraser = !canvasState[section].isEraser;
+            updateEraserButtonUI(section);
+        }
+
+        function updateEraserButtonUI(section) {
+            const btn = document.getElementById(`${section}-eraser-btn`);
+            if (btn) {
+                if (canvasState[section].isEraser) {
+                    btn.classList.remove('bg-gray-200', 'text-gray-700');
+                    btn.classList.add('bg-red-500', 'text-white');
+                } else {
+                    btn.classList.remove('bg-red-500', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            }
+        }
+
+        /* --------------------------------------------------
+         * CHARTS RENDER FUNCTIONS
+         * -------------------------------------------------- */
+        function renderAZChart() {
+            const container = document.getElementById('az-chart-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            englishData.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = 'bg-emerald-50 hover:bg-emerald-100 border-2 border-appGreen rounded-2xl p-3 text-center shadow-sm cursor-pointer bouncy flex flex-col items-center justify-between';
+                card.onclick = () => {
+                    speakText(`${item.letter}. ${item.soundText}`, 'en-US');
+                };
+                card.innerHTML = `
+                    <span class="text-3xl font-bold text-appGreenDark font-play">${item.letter} ${item.letter.toLowerCase()}</span>
+                    <p class="text-xs font-bold text-appPinkDark mt-1">${item.word}</p>
+                    <span class="text-xs text-gray-500">${item.mmWord}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderMmChart() {
+            const container = document.getElementById('mm-chart-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            myanmarData.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = 'bg-pink-50 hover:bg-pink-100 border-2 border-appPink rounded-2xl p-3 text-center shadow-sm cursor-pointer bouncy flex flex-col items-center justify-between';
+                card.onclick = () => {
+                    speakText(`${item.sound}. ${item.word}`);
+                };
+                card.innerHTML = `
+                    <div class="flex items-center justify-center gap-1">
+                        <span class="text-3xl font-bold text-appPinkDark">${item.letter}</span>
+                        <span class="text-lg">${item.icon}</span>
+                    </div>
+                    <p class="text-xs font-bold text-appGreenDark mt-1">${item.sound}</p>
+                    <span class="text-[11px] text-gray-500">${item.word}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderNumber100Chart() {
+            const container = document.getElementById('num-100-chart-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            for (let i = 1; i <= 100; i++) {
+                const mmVal = toBurmeseDigits(i);
+                const card = document.createElement('button');
+                card.className = 'bg-amber-50 hover:bg-amber-100 border border-yellow-300 rounded-xl p-1.5 sm:p-2 text-center shadow-sm cursor-pointer bouncy flex flex-col items-center justify-center';
+                card.onclick = () => {
+                    speakText(`${i}. ${mmVal}`);
+                };
+                card.innerHTML = `
+                    <span class="text-sm sm:text-base font-bold text-appGreenDark font-play">${i}</span>
+                    <span class="text-xs font-bold text-appPinkDark">${mmVal}</span>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        /* --------------------------------------------------
+         * ENGLISH SECTION LOGIC
+         * -------------------------------------------------- */
+        function renderEnglishGrid() {
+            const container = document.getElementById('en-letters-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            englishData.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `p-2 sm:p-3 rounded-2xl font-bold text-base sm:text-lg font-play bouncy border-2 shadow-sm ${
+                    index === currentEnIndex
+                        ? 'bg-appGreen text-white border-appGreenDark scale-105 shadow-md'
+                        : 'bg-white text-gray-700 border-gray-200 hover:border-appGreen'
+                }`;
+                btn.innerText = item.letter;
+                btn.onclick = () => selectEnLetter(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectEnLetter(index) {
+            currentEnIndex = index;
+            const data = englishData[index];
+            document.getElementById('en-selected-letter').innerText = `${data.letter} ${data.letter.toLowerCase()}`;
+            document.getElementById('en-selected-word').innerText = `${data.soundText} (${data.mmWord})`;
+            document.getElementById('en-progress-text').innerText = `ရွေးချယ်ထားသော စာလုံး: ${data.letter}`;
+            
+            // Update shadow text and Duolingo stroke guide dot/arrow
+            document.getElementById('en-shadow-text').innerText = data.letter;
+            document.getElementById('en-arrow-guide').innerHTML = `
+                <div class="duo-stroke-dot bg-appPink text-white border-2 border-white">1</div>
+                <span class="text-[10px] bg-white/90 px-2 py-0.5 rounded-full shadow text-appGreenDark font-bold mt-1">${data.arrow}</span>
+            `;
+
+            renderEnglishGrid();
+            clearCanvas('en-canvas');
+            playCurrentEnAudio();
+        }
+
+        function playCurrentEnAudio() {
+            const data = englishData[currentEnIndex];
+            speakText(`${data.letter}. ${data.soundText}`, 'en-US');
+        }
+
+        /* --------------------------------------------------
+         * MYANMAR SECTION LOGIC
+         * -------------------------------------------------- */
+        function renderMyanmarGrid() {
+            const container = document.getElementById('mm-letters-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            myanmarData.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `p-2 sm:p-3 rounded-2xl font-bold text-base sm:text-lg bouncy border-2 shadow-sm ${
+                    index === currentMmIndex
+                        ? 'bg-appPinkDark text-white border-appPink scale-105 shadow-md'
+                        : 'bg-white text-gray-800 border-gray-200 hover:border-appPink'
+                }`;
+                btn.innerText = item.letter;
+                btn.onclick = () => selectMmLetter(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectMmLetter(index) {
+            currentMmIndex = index;
+            const data = myanmarData[index];
+            document.getElementById('mm-selected-letter').innerText = data.letter;
+            document.getElementById('mm-selected-word').innerText = `${data.letter} - ${data.word} (${data.icon})`;
+            document.getElementById('mm-progress-text').innerText = `ရွေးချယ်ထားသော စာလုံး: ${data.letter}`;
+
+            // Update shadow text and Duolingo stroke guide dot/arrow
+            document.getElementById('mm-shadow-text').innerText = data.letter;
+            document.getElementById('mm-arrow-guide').innerHTML = `
+                <div class="duo-stroke-dot bg-appGreen text-white border-2 border-white">1</div>
+                <span class="text-[10px] bg-white/90 px-2 py-0.5 rounded-full shadow text-appPinkDark font-bold mt-1">${data.arrow}</span>
+            `;
+
+            renderMyanmarGrid();
+            clearCanvas('mm-canvas');
+            playCurrentMmAudio();
+        }
+
+        function playCurrentMmAudio() {
+            const data = myanmarData[currentMmIndex];
+            speakText(`${data.sound}. ${data.word}`);
+        }
+
+        /* --------------------------------------------------
+         * NUMBERS SECTION LOGIC
+         * -------------------------------------------------- */
+        function renderNumbersGrid() {
+            const container = document.getElementById('numbers-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            numbersData.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `p-2.5 rounded-2xl font-bold text-sm sm:text-base bouncy border-2 shadow-sm flex items-center justify-center gap-1 ${
+                    index === currentNumIndex
+                        ? 'bg-yellow-500 text-white border-yellow-600 scale-105'
+                        : 'bg-white text-gray-800 border-yellow-200 hover:border-yellow-400'
+                }`;
+                btn.innerHTML = `<span class="font-play">${item.en}</span> / <span>${item.mm}</span>`;
+                btn.onclick = () => selectNumber(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectNumber(index) {
+            currentNumIndex = index;
+            const data = numbersData[index];
+            document.getElementById('num-display-en').innerText = data.en;
+            document.getElementById('num-display-mm').innerText = data.mm;
+            document.getElementById('num-display-word').innerText = data.word;
+
+            // Render countable visual items
+            const countContainer = document.getElementById('num-items-container');
+            countContainer.innerHTML = '';
+            const count = Math.min(parseInt(data.en), 20);
+            for (let i = 0; i < count; i++) {
+                const span = document.createElement('span');
+                span.className = 'text-lg bouncy';
+                span.innerText = data.icon;
+                countContainer.appendChild(span);
+            }
+
+            // Update shadow text and Duolingo stroke guide dot/arrow
+            document.getElementById('num-shadow-text').innerText = `${data.en} / ${data.mm}`;
+            document.getElementById('num-arrow-guide').innerHTML = `
+                <div class="duo-stroke-dot bg-yellow-500 text-white border-2 border-white">1</div>
+                <span class="text-[10px] bg-white/90 px-2 py-0.5 rounded-full shadow text-yellow-800 font-bold mt-1">${data.arrow}</span>
+            `;
+
+            renderNumbersGrid();
+            clearCanvas('num-canvas');
+            playCurrentNumAudio();
+        }
+
+        function playCurrentNumAudio() {
+            const data = numbersData[currentNumIndex];
+            speakText(`${data.word}`);
+        }
+
+        /* --------------------------------------------------
+         * REPAIRED CANVAS TRACING & DRAWING SYSTEM
+         * -------------------------------------------------- */
+        function initCanvasScale(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            
+            // Sync pixel display density for sharp drawing without offsets
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+        }
+
+        function setupCanvas(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            const sectionKey = canvasId.split('-')[0]; // 'en', 'mm', 'num'
+
+            function getCoordinates(e) {
+                const rect = canvas.getBoundingClientRect();
+                let clientX = e.clientX;
+                let clientY = e.clientY;
+
+                if (e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
+
+                return {
+                    x: (clientX - rect.left),
+                    y: (clientY - rect.top)
+                };
+            }
+
+            function startDrawing(e) {
+                isDrawing = true;
+                const coords = getCoordinates(e);
+                lastX = coords.x;
+                lastY = coords.y;
+                draw(e);
+            }
+
+            function stopDrawing() {
+                isDrawing = false;
+                ctx.beginPath();
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                const coords = getCoordinates(e);
+                const currentConfig = canvasState[sectionKey] || { color: '#2E7D32', size: 12, isEraser: false };
+
+                ctx.lineWidth = currentConfig.size;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                if (currentConfig.isEraser) {
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.strokeStyle = 'rgba(0,0,0,1)';
+                } else {
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.strokeStyle = currentConfig.color;
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(coords.x, coords.y);
+                ctx.stroke();
+
+                lastX = coords.x;
+                lastY = coords.y;
+            }
+
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+            canvas.addEventListener('mousemove', draw);
+
+            // Touch events
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startDrawing(e);
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                stopDrawing();
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                draw(e);
+            }, { passive: false });
+        }
+
+        function clearCanvas(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            }
+        }
+
+        function rewardStar() {
+            totalStars += 1;
+            document.getElementById('quiz-stars').innerText = `⭐ ${totalStars}`;
+            document.getElementById('profile-stars-count').innerText = `${totalStars} Stars`;
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+            speakText('တော်လိုက်တာ ကလေးရယ်!');
+        }
+
+        /* --------------------------------------------------
+         * QUIZ ZONE LOGIC (4 CATEGORIES WITH AUDIO + PROMPTS)
+         * -------------------------------------------------- */
+        function setQuizCategory(cat) {
+            activeQuizCat = cat;
+            document.querySelectorAll('.quiz-cat-btn').forEach(btn => {
+                btn.classList.remove('bg-appGreen', 'bg-appPinkDark', 'bg-yellow-500', 'bg-purple-600', 'text-white');
+                btn.classList.add('bg-white');
+            });
+
+            const activeBtn = document.getElementById(`quiz-cat-${cat}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white');
+                if (cat === 'en') activeBtn.classList.add('bg-appGreen', 'text-white');
+                if (cat === 'mm') activeBtn.classList.add('bg-appPinkDark', 'text-white');
+                if (cat === 'num') activeBtn.classList.add('bg-yellow-500', 'text-white');
+                if (cat === 'mixed') activeBtn.classList.add('bg-purple-600', 'text-white');
+            }
+
+            generateNewQuiz();
+        }
+
+        function generateNewQuiz() {
+            let catToUse = activeQuizCat;
+            if (catToUse === 'mixed') {
+                const cats = ['en', 'mm', 'num'];
+                catToUse = cats[Math.floor(Math.random() * cats.length)];
+            }
+
+            let options = [];
+            let targetItem = null;
+
+            if (catToUse === 'en') {
+                const shuffled = [...englishData].sort(() => 0.5 - Math.random());
+                targetItem = shuffled[0];
+                options = shuffled.slice(0, 4).map(item => ({ text: item.letter, correct: item.letter === targetItem.letter }));
+                currentQuizQuestion = {
+                    prompt: `အောက်ပါတို့အနက် အင်္ဂလိပ်စာလုံး '${targetItem.letter}' ကို ရွေးပါ`,
+                    speakText: `ကျေးဇူးပြု၍ စာလုံး ${targetItem.letter} ကို ရွေးချယ်ပါ`,
+                    item: targetItem
+                };
+            } else if (catToUse === 'mm') {
+                const shuffled = [...myanmarData].sort(() => 0.5 - Math.random());
+                targetItem = shuffled[0];
+                options = shuffled.slice(0, 4).map(item => ({ text: item.letter, correct: item.letter === targetItem.letter }));
+                currentQuizQuestion = {
+                    prompt: `အောက်ပါတို့အနက် မြန်မာဗျည်း '${targetItem.letter}' (${targetItem.sound}) ကို ရွေးပါ`,
+                    speakText: `မြန်မာဗျည်း ${targetItem.sound} ကို ရွေးပေးပါ`,
+                    item: targetItem
+                };
+            } else { // num (Extended up to 100 for quiz)
+                const numVal = Math.floor(Math.random() * 100) + 1;
+                const mmVal = toBurmeseDigits(numVal);
+                
+                // Construct options
+                const optionNumbers = new Set([numVal]);
+                while(optionNumbers.size < 4) {
+                    optionNumbers.add(Math.floor(Math.random() * 100) + 1);
+                }
+
+                options = Array.from(optionNumbers).map(n => ({
+                    text: `${n} (${toBurmeseDigits(n)})`,
+                    correct: n === numVal
+                }));
+
+                currentQuizQuestion = {
+                    prompt: `အောက်ပါတို့အနက် ဂဏန်း '${numVal}' / '${mmVal}' ကို ရွေးပါ`,
+                    speakText: `ဂဏန်း ${numVal} သို့မဟုတ် ${mmVal} ဘယ်တစ်ခုလဲ ရွေးပါ`,
+                    item: { en: numVal, mm: mmVal }
+                };
+            }
+
+            options.sort(() => 0.5 - Math.random());
+
+            const container = document.getElementById('quiz-options-container');
+            container.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-white border-4 border-appPinkLight hover:border-appGreen text-gray-800 text-xl sm:text-2xl font-bold py-4 rounded-2xl shadow-md bouncy';
+                btn.innerText = opt.text;
+                btn.onclick = () => checkQuizAnswer(opt.correct, btn);
+                container.appendChild(btn);
+            });
+
+            document.getElementById('quiz-question-text').innerText = currentQuizQuestion.prompt;
+            playQuizQuestionAudio();
+        }
+
+        function playQuizQuestionAudio() {
+            if (currentQuizQuestion) {
+                speakText(currentQuizQuestion.speakText);
+            }
+        }
+
+        function checkQuizAnswer(isCorrect, btnElement) {
+            if (isCorrect) {
+                btnElement.classList.remove('bg-white', 'border-appPinkLight');
+                btnElement.classList.add('bg-appGreen', 'text-white', 'border-appGreenDark');
+                quizScore += 10;
+                totalStars += 2;
+                document.getElementById('quiz-score').innerText = quizScore;
+                document.getElementById('quiz-stars').innerText = `⭐ ${totalStars}`;
+                document.getElementById('profile-stars-count').innerText = `${totalStars} Stars`;
+
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                speakText('မှန်ပါတယ်! တော်လိုက်တာ!');
+
+                setTimeout(() => {
+                    generateNewQuiz();
+                }, 1500);
+            } else {
+                btnElement.classList.add('bg-red-200', 'border-red-400');
+                speakText('မှားသွားပါတယ်။ ပြန်ကြိုးစားကြည့်ပါနော်!');
+            }
+        }
+
+        /* Window Resize Handle */
+        window.onresize = function() {
+            initCanvasScale('en-canvas');
+            initCanvasScale('mm-canvas');
+            initCanvasScale('num-canvas');
+        };
+
+        /* INIT ON LOAD */
+        window.onload = function() {
+            renderEnglishGrid();
+            renderMyanmarGrid();
+            renderNumbersGrid();
+
+            // Render Chart Views
+            renderAZChart();
+            renderMmChart();
+            renderNumber100Chart();
+
+            // Setup repaired canvases
+            setupCanvas('en-canvas');
+            setupCanvas('mm-canvas');
+            setupCanvas('num-canvas');
+
+            initCanvasScale('en-canvas');
+            initCanvasScale('mm-canvas');
+            initCanvasScale('num-canvas');
+
+            selectEnLetter(0);
+            selectMmLetter(0);
+            selectNumber(0);
+        };
+    </script>
+</body>
+</html>
